@@ -22,8 +22,11 @@ def get_instance(instance_id):
     filters = [{'Name': 'instance-id', 'Values': [instance_id]}]
     instances = get_instances(filters)
     instances = [
-        i for r in instances['Reservations']
-        for i in r['Instances'] if i['InstanceId'] == instance_id]
+        i
+        for r in instances['Reservations']
+        for i in r['Instances']
+        if i['InstanceId'] == instance_id
+    ]
     if instances:
         return instances[0]
 
