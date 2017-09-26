@@ -16,4 +16,4 @@
   ec2_facts:
 
 - name: Set name for instance
-  script: "/usr/bin/env AWS_DEFAULT_REGION={{ region.stdout }} {{ role_path }}/files/host_naming.py {{ ansible_ec2_instance_id }} {{ '-n ' + host_naming_name_tag if host_naming_name_tag else '' }} {{ '-g ' + host_naming_group_tag if host_naming_group_tag else '' }} {{ '-r ' + host_naming_retries if host_naming_retries else '' }} {{ '--overwrite' if host_naming_overwrite else '' }} {{ '--verbose' if host_naming_verbose else '' }} {{ '--debug' if host_naming_debug else '' }}"
+  script: "/usr/bin/env AWS_DEFAULT_REGION={{ region.stdout }} {{ role_path }}/files/host_naming.py {{ ansible_ec2_instance_id }} {{ '-n ' + str(host_naming_name_tag) if host_naming_name_tag else '' }} {{ '-g ' + str(host_naming_group_tag) if host_naming_group_tag else '' }} {{ '-r ' + str(host_naming_retries) if host_naming_retries else '' }} {{ '--overwrite' if host_naming_overwrite else '' }} {{ '--verbose' if host_naming_verbose else '' }} {{ '--debug' if host_naming_debug else '' }}"
