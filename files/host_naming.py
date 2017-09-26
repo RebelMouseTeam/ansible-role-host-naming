@@ -48,10 +48,24 @@ def set_tag(instance_id, tag, value):
     logger.debug('create_tags response: "{}"'.format(response))
 
 
-def set_instance_name(instance_id, group, name_tag, group_tag):
+def set_instance_name(instance_id, group, name_tag, group_tag, name_overwrite):
     instance = get_instance(instance_id)
     if not instance:
         logger.critical('instance not found "{}"'.format(instance_id))
+        exit(1)
+
+    logger.info('instance "{}"'.format(instance))
+
+    if 'Tags' not in instance:
+        logger.critical('instance tags not found "{}"'.format(instance_id))
+        exit(1)
+
+    name = get_tag(instance, name_tag)
+    if name and not name_overwrite:
+        logger.error('instance already has name "{}"'.format(name))
+        exit(1)
+
+    logger.info('instance name "{}"'.format(name))
 
 
 def main():
@@ -68,6 +82,7 @@ def main():
         '--groupTag',
         help='Tag where group value is stored("Group" by default)',
         default='Group')
+    parser.add_argument('--overwrite', action='store_true', default=False)
     parser.add_argument('--verbose', action='store_true', default=False)
     parser.add_argument('--debug', action='store_true', default=False)
     args = parser.parse_args()
@@ -80,7 +95,12 @@ def main():
         logger.setLevel(logging.WARNING)
 
     logger.debug('parse arguments "{}"'.format(args))
-    set_instance_name(args.instanceId, args.group, args.nameTag, args.groupTag)
+    set_instance_name(
+        args.instanceId,
+        args.group,
+        args.nameTag,
+        args.groupTag,
+        args.overwrite)
 
 
 if __name__ == '__main__':
