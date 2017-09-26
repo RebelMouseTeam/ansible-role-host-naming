@@ -42,7 +42,10 @@ def get_tag(instance, tag):
 
 def set_tag(instance_id, tag, value):
     tags = [{'Key': tag, 'Value': value}]
-    client.create_tags(Resources=[instance_id], Tags=tags)
+    logger.debug('create_tags instance_id tags: "{}" "{}"'.format(
+        instance_id, tags))
+    response = client.create_tags(Resources=[instance_id], Tags=tags)
+    logger.debug('create_tags response: "{}"'.format(response))
 
 
 def set_instance_name(instance_id, group, name_tag, group_tag):
