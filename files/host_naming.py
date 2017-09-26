@@ -6,6 +6,12 @@ import logging
 import boto3
 
 client = boto3.client('ec2')
+logger = logging.getLogger('host_naming')
+formatter = logging.Formatter('%(levelname)s %(asctime)s: %(message)s')
+handler = logging.StreamHandler()
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.setLevel(logging.WARNING)
 
 
 def get_instances(filters):
@@ -52,7 +58,17 @@ def main():
         '--groupTag',
         help='Tag where group value is stored("Group" by default)',
         default='Group')
+    parser.add_argument('--verbose', action='store_true', default=False)
+    parser.add_argument('--debug', action='store_true', default=False)
     args = parser.parse_args()
+
+    if args.verbose:
+        logger.setLevel(logging.INFO)
+
+    if args.debug:
+        logger.setLevel(logging.DEBUG)
+
+    logger.debug('parse arguments {}'.format(args))
     set_instance_name(args.instanceId, args.group, args.nameTag, args.groupTag)
 
 
