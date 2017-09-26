@@ -54,7 +54,7 @@ def set_instance_name(instance_id, group, name_tag, group_tag, name_overwrite):
         logger.critical('instance not found "{}"'.format(instance_id))
         exit(1)
 
-    logger.info('instance "{}"'.format(instance))
+    logger.debug('instance "{}"'.format(instance))
 
     if 'Tags' not in instance:
         logger.critical('instance tags not found "{}"'.format(instance_id))
