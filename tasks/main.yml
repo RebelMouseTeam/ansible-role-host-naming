@@ -2,5 +2,5 @@
 - name: Gather facts
   ec2_facts:
 
-- name: Generate new name for instance
+- name: Set name for instance
   script: "{{ role_path }}/files/host_naming.py {{ ansible_ec2_instance_id }} {{ '--overwrite' if host_naming_overwrite else '' }}"
