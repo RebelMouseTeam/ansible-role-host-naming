@@ -1,12 +1,19 @@
 ---
-- name: Ensure boto3 package
+- name: Ensure required package
   apt:
-    name: python3-boto3
+    name:
+      - python3-boto3
+      - curl
+      - jq
     state: present
     update_cache: yes
+
+- name: Gather current region
+  shell: curl --silent http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .region
+  register: region
 
 - name: Gather facts
   ec2_facts:
 
 - name: Set name for instance
-  script: "/usr/bin/env AWS_DEFAULT_REGION=us-east-1 {{ role_path }}/files/host_naming.py {{ ansible_ec2_instance_id }} {{ '--overwrite' if host_naming_overwrite else '' }}"
+  script: "/usr/bin/env AWS_DEFAULT_REGION={{ region.stdout }} {{ role_path }}/files/host_naming.py {{ ansible_ec2_instance_id }} {{ '--overwrite' if host_naming_overwrite else '' }}"
