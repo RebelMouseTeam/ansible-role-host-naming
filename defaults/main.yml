@@ -1,1 +1,7 @@
 ---
+host_naming_name_tag: "Name"
+host_naming_group_tag: "Group"
+host_naming_retries: 10
+host_naming_overwrite: no
+host_naming_verbose: yes
+host_naming_debug: no

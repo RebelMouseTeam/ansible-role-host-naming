@@ -58,7 +58,6 @@ def set_tag(instance_id, tag, value):
 
 def set_instance_name(
     instance_id,
-    group,
     name_tag,
     group_tag,
     name_overwrite,
@@ -131,7 +130,6 @@ def set_instance_name(
 def main():
     parser = argparse.ArgumentParser(description='Host Naming')
     parser.add_argument('instanceId', help='EC2 instance id')
-    parser.add_argument('group', help='Group to use for instance naming')
     parser.add_argument(
         '-n',
         '--nameTag',
@@ -162,10 +160,9 @@ def main():
 
     logger.debug('parse arguments "{}"'.format(args))
     set_instance_name(
-        args.instanceId,
-        args.group,
-        args.nameTag,
-        args.groupTag,
+        args.instanceId and args.instanceId.strip(),
+        args.nameTag and args.nameTag.strip(),
+        args.groupTag and args.groupTag.strip(),
         args.overwrite,
         args.retries)
 
