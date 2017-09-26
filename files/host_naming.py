@@ -17,18 +17,13 @@ def get_instances(filters):
     logger.debug('describe_instances filters: "{}"'.format(filters))
     response = client.describe_instances(Filters=filters)
     logger.debug('describe_instances response: "{}"'.format(response))
-    return response
+    return [i for r in response['Reservations'] for i in r['Instances']]
 
 
 def get_instance(instance_id):
     filters = [{'Name': 'instance-id', 'Values': [instance_id]}]
     instances = get_instances(filters)
-    instances = [
-        i
-        for r in instances['Reservations']
-        for i in r['Instances']
-        if i['InstanceId'] == instance_id
-    ]
+    instances = [i for i in instances if i['InstanceId'] == instance_id]
     if instances:
         return instances[0]
 
@@ -66,6 +61,21 @@ def set_instance_name(instance_id, group, name_tag, group_tag, name_overwrite):
         exit(1)
 
     logger.info('instance name "{}"'.format(name))
+
+    group = get_tag(instance, group_tag)
+    if not group:
+        logger.critical('instance has no group tag "{}"'.format(instance_id))
+        exit(1)
+
+    logger.info('instance group "{}"'.format(group))
+
+    filters = [{'Name': 'tag:{}'.format(group_tag), 'Values': [group]}]
+    group_instances = get_instances(filters)
+    group_instances_names = [get_tag(i, name_tag) for i in group_instances]
+    group_instances_names = [n for n in group_instances_names if n]
+
+    logger.info('existing names in group "{}"'.format(group_instances_names))
+
 
 
 def main():
