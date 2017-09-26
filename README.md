@@ -21,3 +21,26 @@ Role set "incremental" tag:Name for instance based on tag:Group. For example, in
 * `host_naming_overwrite` [default: `no`]: should existing name be overwritten or not.
 * `host_naming_verbose` [default: `yes`]: informative logging.
 * `host_naming_debug` [default: `no`]: debug logging.
+
+
+## IAM
+
+Following IAM policy should be attached to instance profile role.
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:CreateTags",
+                "ec2:DescribeInstances"
+            ],
+            "Resource": [
+                "*"
+            ]
+        }
+    ]
+}
+```
