@@ -20,6 +20,11 @@ def get_instances(filters):
     return [i for r in response['Reservations'] for i in r['Instances']]
 
 
+def get_instances_in_group(group_tag, group):
+    filters = [{'Name': 'tag:{}'.format(group_tag), 'Values': [group]}]
+    return get_instances(filters)
+
+
 def get_instance(instance_id):
     filters = [{'Name': 'instance-id', 'Values': [instance_id]}]
     instances = get_instances(filters)
@@ -76,15 +81,23 @@ def set_instance_name(
 
     logger.info('instance group "{}"'.format(group))
 
-    filters = [{'Name': 'tag:{}'.format(group_tag), 'Values': [group]}]
-    group_instances = get_instances(filters)
+    group_instances = get_instances_in_group(group_tag, group)
     group_instances_names = [get_tag(i, name_tag) for i in group_instances]
     group_instances_names = [n for n in group_instances_names if n]
 
     logger.info('existing names in group "{}"'.format(group_instances_names))
 
-    for r in range(retries):
-        pass
+    n = 0
+    while retries > 0:
+        n += 1
+        name = '{}{}'.format(group, n)
+        if name in group_instances_names:
+            continue
+
+        logger.info('trying name "{}"'.format(name))
+        # set_tag(instance_id, name_tag, name)
+
+        retries -= 1
 
 
 def main():
