@@ -7,15 +7,17 @@ import boto3
 
 client = boto3.client('ec2')
 logger = logging.getLogger('host_naming')
-formatter = logging.Formatter('%(levelname)s %(asctime)s: %(message)s')
 handler = logging.StreamHandler()
-handler.setFormatter(formatter)
+handler.setFormatter(
+    logging.Formatter('%(levelname)s %(asctime)s: %(message)s'))
 logger.addHandler(handler)
-logger.setLevel(logging.WARNING)
 
 
 def get_instances(filters):
-    return client.describe_instances(Filters=filters)
+    logger.debug('describe_instances filters: "{}"'.format(filters))
+    response = client.describe_instances(Filters=filters)
+    logger.debug('describe_instances response: "{}"'.format(response))
+    return response
 
 
 def get_instance(instance_id):
@@ -44,7 +46,9 @@ def set_tag(instance_id, tag, value):
 
 
 def set_instance_name(instance_id, group, name_tag, group_tag):
-    pass
+    instance = get_instance(instance_id)
+    if not instance:
+        logger.critical('instance not found "{}"'.format(instance_id))
 
 
 def main():
@@ -65,13 +69,14 @@ def main():
     parser.add_argument('--debug', action='store_true', default=False)
     args = parser.parse_args()
 
-    if args.verbose:
-        logger.setLevel(logging.INFO)
-
     if args.debug:
         logger.setLevel(logging.DEBUG)
+    elif args.verbose:
+        logger.setLevel(logging.INFO)
+    else:
+        logger.setLevel(logging.WARNING)
 
-    logger.debug('parse arguments {}'.format(args))
+    logger.debug('parse arguments "{}"'.format(args))
     set_instance_name(args.instanceId, args.group, args.nameTag, args.groupTag)
 
 
