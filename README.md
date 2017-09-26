@@ -1,6 +1,6 @@
 # Host Naming for EC2
 
-Role set "incremental" tag:Name for instance based on tag:Group. For example instance with tag:Group "docker" will be named "docker1", etc.
+Role set "incremental" tag:Name for instance based on tag:Group. For example, instance with tag:Group "docker" will be named "docker1", etc.
 
 ## Usage
 
