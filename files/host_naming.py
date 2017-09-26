@@ -43,7 +43,14 @@ def set_tag(instance_id, tag, value):
     logger.debug('create_tags response: "{}"'.format(response))
 
 
-def set_instance_name(instance_id, group, name_tag, group_tag, name_overwrite):
+def set_instance_name(
+    instance_id,
+    group,
+    name_tag,
+    group_tag,
+    name_overwrite,
+    retries
+):
     instance = get_instance(instance_id)
     if not instance:
         logger.critical('instance not found "{}"'.format(instance_id))
@@ -76,6 +83,8 @@ def set_instance_name(instance_id, group, name_tag, group_tag, name_overwrite):
 
     logger.info('existing names in group "{}"'.format(group_instances_names))
 
+    for r in range(retries):
+        pass
 
 
 def main():
@@ -92,6 +101,12 @@ def main():
         '--groupTag',
         help='Tag where group value is stored("Group" by default)',
         default='Group')
+    parser.add_argument(
+        '-r',
+        '--retries',
+        help='Max retries for setting new name',
+        type=int,
+        default=10)
     parser.add_argument('--overwrite', action='store_true', default=False)
     parser.add_argument('--verbose', action='store_true', default=False)
     parser.add_argument('--debug', action='store_true', default=False)
@@ -110,7 +125,8 @@ def main():
         args.group,
         args.nameTag,
         args.groupTag,
-        args.overwrite)
+        args.overwrite,
+        args.retries)
 
 
 if __name__ == '__main__':
