@@ -3,17 +3,11 @@
   apt:
     name:
       - python3-boto3
-      - curl
-      - jq
     state: present
     update_cache: yes
-
-- name: Gather current region
-  shell: curl --silent http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .region
-  register: region
 
 - name: Gather facts
   ec2_facts:
 
 - name: Set name for instance
-  script: "/usr/bin/env AWS_DEFAULT_REGION={{ region.stdout }} {{ role_path }}/files/host_naming.py {{ ansible_ec2_instance_id }} {{ '-n {}'.format(host_naming_name_tag) if host_naming_name_tag else '' }} {{ '-g {}'.format(host_naming_group_tag) if host_naming_group_tag else '' }} {{ '-r {}'.format(host_naming_retries) if host_naming_retries else '' }} {{ '--overwrite' if host_naming_overwrite else '' }} {{ '--verbose' if host_naming_verbose else '' }} {{ '--debug' if host_naming_debug else '' }}"
+  script: "/usr/bin/env AWS_DEFAULT_REGION={{ ansible_ec2_placement_region }} {{ role_path }}/files/host_naming.py {{ ansible_ec2_instance_id }} {{ '-n {}'.format(host_naming_name_tag) if host_naming_name_tag else '' }} {{ '-g {}'.format(host_naming_group_tag) if host_naming_group_tag else '' }} {{ '-r {}'.format(host_naming_retries) if host_naming_retries else '' }} {{ '--overwrite' if host_naming_overwrite else '' }} {{ '--verbose' if host_naming_verbose else '' }} {{ '--debug' if host_naming_debug else '' }}"
