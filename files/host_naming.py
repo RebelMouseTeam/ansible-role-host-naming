@@ -2,6 +2,8 @@
 
 import argparse
 import logging
+import time
+import random
 
 import boto3
 
@@ -9,7 +11,7 @@ client = boto3.client('ec2')
 logger = logging.getLogger('host_naming')
 handler = logging.StreamHandler()
 handler.setFormatter(
-logging.Formatter('%(asctime)s %(levelname)s: %(message)s'))
+    logging.Formatter('%(asctime)s %(levelname)s: %(message)s'))
 logger.addHandler(handler)
 
 
@@ -23,6 +25,12 @@ def get_instances(filters):
 def get_instances_in_group(group_tag, group):
     filters = [{'Name': 'tag:{}'.format(group_tag), 'Values': [group]}]
     return get_instances(filters)
+
+
+def get_group_instances_names(name_tag, group_instances):
+    group_instances_names = [get_tag(i, name_tag) for i in group_instances]
+    group_instances_names = [n for n in group_instances_names if n]
+    return group_instances_names
 
 
 def get_instance(instance_id):
@@ -82,8 +90,8 @@ def set_instance_name(
     logger.info('instance group "{}"'.format(group))
 
     group_instances = get_instances_in_group(group_tag, group)
-    group_instances_names = [get_tag(i, name_tag) for i in group_instances]
-    group_instances_names = [n for n in group_instances_names if n]
+    group_instances_names = get_group_instances_names(
+        name_tag, group_instances)
 
     logger.info('existing names in group "{}"'.format(group_instances_names))
 
@@ -95,9 +103,29 @@ def set_instance_name(
             continue
 
         logger.info('trying name "{}"'.format(name))
-        # set_tag(instance_id, name_tag, name)
+        set_tag(instance_id, name_tag, name)
+
+        # sleep 1-10 seconds before verify collisions in group
+        # random time is used to prevent simultanious execution
+        t = random.randint(1, 10)
+        logger.debug('sleep for "{}"'.format(t))
+        time.sleep(t)
+
+        group_instances = get_instances_in_group(group_tag, group)
+        group_instances_names = get_group_instances_names(
+            name_tag, group_instances)
+
+        if group_instances_names.count(name) > 1:
+            logger.warning('name collision "{}"'.format(name))
+        elif group_instances_names.count(name) == 1:
+            logger.info('name successfully set "{}"'.format(name))
+            break
+        else:
+            logger.error(
+                'name not found in group after set "{}"'.format(name))
 
         retries -= 1
+        continue
 
 
 def main():
