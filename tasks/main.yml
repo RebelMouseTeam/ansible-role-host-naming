@@ -1,4 +1,10 @@
 ---
+- name: Ensure boto3 package
+  apt:
+    name: python3-boto3
+    state: present
+    update_cache: yes
+
 - name: Gather facts
   ec2_facts:
 
