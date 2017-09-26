@@ -9,7 +9,7 @@ client = boto3.client('ec2')
 logger = logging.getLogger('host_naming')
 handler = logging.StreamHandler()
 handler.setFormatter(
-    logging.Formatter('%(levelname)s %(asctime)s: %(message)s'))
+logging.Formatter('%(asctime)s %(levelname)s: %(message)s'))
 logger.addHandler(handler)
 
 
