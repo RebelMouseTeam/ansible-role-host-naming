@@ -24,3 +24,12 @@
 - name: Set hostname
   hostname:
     name: "{{ ec2_tags.tags.Name }}"
+
+- name: Set hostname in /etc/hosts
+  lineinfile:
+    path: /etc/hosts
+    regexp: "^127\.0\.0\.1"
+    line: "127.0.0.1 localhost {{ ec2_tags.tags.Name }}"
+    owner: root
+    group: root
+    mode: 0644
