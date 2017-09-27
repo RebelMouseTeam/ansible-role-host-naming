@@ -37,9 +37,10 @@ This role should be applied after instance boot, because EC2 instance tags are u
 * `host_naming_name_tag` [default: `Name`]: which tag should be set.
 * `host_naming_group_tag` [default: `Group`]: which tag should be used for new name generaton.
 * `host_naming_retries` [default: `10`]: how many times script should try to set name in case of collision.
-* `host_naming_overwrite` [default: `no`]: should existing name be overwritten or not.
+* `host_naming_overwrite` [default: `no`]: should existing name be overwritten.
 * `host_naming_verbose` [default: `yes`]: informative logging.
 * `host_naming_debug` [default: `no`]: debug logging.
+* `host_naming_set_hostname` [default: `yes`]: set hostname on target instances.
 
 
 ## IAM
