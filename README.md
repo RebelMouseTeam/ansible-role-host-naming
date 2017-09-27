@@ -55,6 +55,7 @@ Following IAM policy should be attached to instance profile role.
             "Effect": "Allow",
             "Action": [
                 "ec2:CreateTags",
+                "ec2:DescribeTags",
                 "ec2:DescribeInstances"
             ],
             "Resource": [

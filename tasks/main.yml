@@ -3,6 +3,7 @@
   apt:
     name:
       - python3-boto3
+      - python-boto
     state: present
     update_cache: yes
 
