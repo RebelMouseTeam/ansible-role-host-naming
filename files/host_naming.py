@@ -9,10 +9,17 @@ import boto3
 
 client = boto3.client('ec2')
 logger = logging.getLogger('host_naming')
+
 handler = logging.StreamHandler()
 handler.setFormatter(
     logging.Formatter('%(asctime)s %(levelname)s: %(message)s'))
 logger.addHandler(handler)
+
+fs_handler = logging.FileHandler('/var/log/host_naming.log')
+fs_handler.setFormatter(
+    logging.Formatter('%(asctime)s %(levelname)s: %(message)s'))
+fs_handler.setLevel(logging.DEBUG)
+logger.addHandler(fs_handler)
 
 
 def get_instances(filters):
