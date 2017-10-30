@@ -2,10 +2,16 @@
 - name: Ensure required package
   apt:
     name:
-      - python3-boto3
+      - python3-pip
       - python-boto
     state: present
     update_cache: yes
+
+- name: Install boto3
+  pip:
+    executable: pip3
+    name: boto3
+    state: present
 
 - name: Gather facts
   ec2_facts:
