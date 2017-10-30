@@ -132,6 +132,10 @@ def set_instance_name(
 
         retries -= 1
         continue
+    else:
+        logger.error('max retries reached')
+        exit(1)
+
 
 
 def main():
