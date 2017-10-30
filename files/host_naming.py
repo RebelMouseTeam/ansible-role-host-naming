@@ -67,6 +67,7 @@ def set_instance_name(
     instance_id,
     name_tag,
     group_tag,
+    name_prefix,
     name_overwrite,
     retries
 ):
@@ -104,7 +105,7 @@ def set_instance_name(
     n = 0
     while retries > 0:
         n += 1
-        name = '{}{}'.format(group, n)
+        name = '{}{}'.format(name_prefix or group, n)
         if name in group_instances_names:
             continue
 
@@ -157,6 +158,12 @@ def main():
         help='Max retries for setting new name',
         type=int,
         default=10)
+    parser.add_argument(
+        '-p',
+        '--namePrefix',
+        help='Name perfix',
+        type=str,
+        default='')
     parser.add_argument('--overwrite', action='store_true', default=False)
     parser.add_argument('--verbose', action='store_true', default=False)
     parser.add_argument('--debug', action='store_true', default=False)
@@ -174,6 +181,7 @@ def main():
         args.instanceId and args.instanceId.strip(),
         args.nameTag and args.nameTag.strip(),
         args.groupTag and args.groupTag.strip(),
+        args.namePrefix and args.namePrefix.strip(),
         args.overwrite,
         args.retries)
 
