@@ -6,3 +6,4 @@ host_naming_overwrite: no
 host_naming_verbose: yes
 host_naming_debug: no
 host_naming_set_hostname: yes
+host_naming_name_prefix: ""
