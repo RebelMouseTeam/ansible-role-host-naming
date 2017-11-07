@@ -91,7 +91,8 @@ def set_instance_name(
             logger.info('instance group "{}"'.format(group))
             name_prefix = group
         else:
-            logger.critical('instance has no group tag "{}" to use as name prefix'.format(instance_id))
+            message = 'instance has no group tag "{}" to use as name prefix'
+            logger.critical(message.format(instance_id))
             exit(1)
 
     logger.info('instance name prefix "{}"'.format(name_prefix))
@@ -136,7 +137,6 @@ def set_instance_name(
     else:
         logger.error('max retries reached')
         exit(1)
-
 
 
 def main():
