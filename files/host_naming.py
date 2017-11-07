@@ -30,11 +30,6 @@ def get_instances(filters=None):
     return [i for r in response['Reservations'] for i in r['Instances']]
 
 
-def get_instances_in_group(group_tag, group):
-    filters = [{'Name': 'tag:{}'.format(group_tag), 'Values': [group]}]
-    return get_instances(filters)
-
-
 def get_instance_names(name_tag, instances):
     instance_names = [get_tag(i, name_tag) for i in instances]
     instance_names = [n for n in instance_names if n]
@@ -90,12 +85,16 @@ def set_instance_name(
 
     logger.info('instance name "{}"'.format(name))
 
-    group = get_tag(instance, group_tag)
-    if not group:
-        logger.critical('instance has no group tag "{}"'.format(instance_id))
-        exit(1)
+    if not name_prefix:
+        group = get_tag(instance, group_tag)
+        if group:
+            logger.info('instance group "{}"'.format(group))
+            name_prefix = group
+        else:
+            logger.critical('instance has no group tag "{}" to use as name prefix'.format(instance_id))
+            exit(1)
 
-    logger.info('instance group "{}"'.format(group))
+    logger.info('instance name prefix "{}"'.format(name_prefix))
 
     instances = get_instances()
     instance_names = get_instance_names(
@@ -106,7 +105,7 @@ def set_instance_name(
     n = 0
     while retries > 0:
         n += 1
-        name = '{}{}'.format(name_prefix or group, n)
+        name = '{}{}'.format(name_prefix, n)
         if name in instance_names:
             continue
 
@@ -130,7 +129,7 @@ def set_instance_name(
             break
         else:
             logger.error(
-                'name not found in group after set "{}"'.format(name))
+                'name not found after set "{}"'.format(name))
 
         retries -= 1
         continue
