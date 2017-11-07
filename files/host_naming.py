@@ -22,7 +22,8 @@ fs_handler.setLevel(logging.DEBUG)
 logger.addHandler(fs_handler)
 
 
-def get_instances(filters):
+def get_instances(filters=None):
+    filters = filters or []
     logger.debug('describe_instances filters: "{}"'.format(filters))
     response = client.describe_instances(Filters=filters)
     logger.debug('describe_instances response: "{}"'.format(response))
@@ -34,10 +35,10 @@ def get_instances_in_group(group_tag, group):
     return get_instances(filters)
 
 
-def get_group_instances_names(name_tag, group_instances):
-    group_instances_names = [get_tag(i, name_tag) for i in group_instances]
-    group_instances_names = [n for n in group_instances_names if n]
-    return group_instances_names
+def get_instance_names(name_tag, instances):
+    instance_names = [get_tag(i, name_tag) for i in instances]
+    instance_names = [n for n in instance_names if n]
+    return instance_names
 
 
 def get_instance(instance_id):
@@ -97,7 +98,7 @@ def set_instance_name(
     logger.info('instance group "{}"'.format(group))
 
     group_instances = get_instances_in_group(group_tag, group)
-    group_instances_names = get_group_instances_names(
+    group_instances_names = get_instance_names(
         name_tag, group_instances)
 
     logger.info('existing names in group "{}"'.format(group_instances_names))
@@ -119,7 +120,7 @@ def set_instance_name(
         time.sleep(t)
 
         group_instances = get_instances_in_group(group_tag, group)
-        group_instances_names = get_group_instances_names(
+        group_instances_names = get_instance_names(
             name_tag, group_instances)
 
         if group_instances_names.count(name) > 1:
