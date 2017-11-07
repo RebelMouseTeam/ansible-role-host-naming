@@ -97,17 +97,17 @@ def set_instance_name(
 
     logger.info('instance group "{}"'.format(group))
 
-    instances = get_instances_in_group(group_tag, group)
-    group_instances_names = get_instance_names(
+    instances = get_instances()
+    instance_names = get_instance_names(
         name_tag, instances)
 
-    logger.info('existing names in group "{}"'.format(group_instances_names))
+    logger.info('existing names "{}"'.format(instance_names))
 
     n = 0
     while retries > 0:
         n += 1
         name = '{}{}'.format(name_prefix or group, n)
-        if name in group_instances_names:
+        if name in instance_names:
             continue
 
         logger.info('trying name "{}"'.format(name))
@@ -119,13 +119,13 @@ def set_instance_name(
         logger.debug('sleep for "{}"'.format(t))
         time.sleep(t)
 
-        instances = get_instances_in_group(group_tag, group)
-        group_instances_names = get_instance_names(
+        instances = get_instances()
+        instance_names = get_instance_names(
             name_tag, instances)
 
-        if group_instances_names.count(name) > 1:
+        if instance_names.count(name) > 1:
             logger.warning('name collision "{}"'.format(name))
-        elif group_instances_names.count(name) == 1:
+        elif instance_names.count(name) == 1:
             logger.info('name successfully set "{}"'.format(name))
             break
         else:
