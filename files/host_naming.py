@@ -74,18 +74,18 @@ def set_instance_name(
 
     logger.debug('instance "{}"'.format(instance))
 
-    if 'Tags' not in instance:
-        logger.critical('instance tags not found "{}"'.format(instance_id))
-        exit(1)
-
-    name = get_tag(instance, name_tag)
-    if name and not name_overwrite:
-        logger.error('instance already has name "{}"'.format(name))
-        exit(1)
-
-    logger.info('instance name "{}"'.format(name))
+    if 'Tags' in instance:
+        name = get_tag(instance, name_tag)
+        logger.info('instance name "{}"'.format(name))
+        if name and not name_overwrite:
+            logger.error('instance already has name "{}"'.format(name))
+            exit(1)
 
     if not name_prefix:
+        if 'Tags' not in instance:
+            logger.critical('instance tags not found "{}"'.format(instance_id))
+            exit(1)
+
         group = get_tag(instance, group_tag)
         if group:
             logger.info('instance group "{}"'.format(group))
