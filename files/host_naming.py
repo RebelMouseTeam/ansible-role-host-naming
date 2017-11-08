@@ -22,22 +22,18 @@ fs_handler.setLevel(logging.DEBUG)
 logger.addHandler(fs_handler)
 
 
-def get_instances(filters):
+def get_instances(filters=None):
+    filters = filters or []
     logger.debug('describe_instances filters: "{}"'.format(filters))
     response = client.describe_instances(Filters=filters)
     logger.debug('describe_instances response: "{}"'.format(response))
     return [i for r in response['Reservations'] for i in r['Instances']]
 
 
-def get_instances_in_group(group_tag, group):
-    filters = [{'Name': 'tag:{}'.format(group_tag), 'Values': [group]}]
-    return get_instances(filters)
-
-
-def get_group_instances_names(name_tag, group_instances):
-    group_instances_names = [get_tag(i, name_tag) for i in group_instances]
-    group_instances_names = [n for n in group_instances_names if n]
-    return group_instances_names
+def get_instance_names(name_tag, instances):
+    instance_names = [get_tag(i, name_tag) for i in instances]
+    instance_names = [n for n in instance_names if n]
+    return instance_names
 
 
 def get_instance(instance_id):
@@ -89,24 +85,29 @@ def set_instance_name(
 
     logger.info('instance name "{}"'.format(name))
 
-    group = get_tag(instance, group_tag)
-    if not group:
-        logger.critical('instance has no group tag "{}"'.format(instance_id))
-        exit(1)
+    if not name_prefix:
+        group = get_tag(instance, group_tag)
+        if group:
+            logger.info('instance group "{}"'.format(group))
+            name_prefix = group
+        else:
+            message = 'instance has no group tag "{}" to use as name prefix'
+            logger.critical(message.format(instance_id))
+            exit(1)
 
-    logger.info('instance group "{}"'.format(group))
+    logger.info('instance name prefix "{}"'.format(name_prefix))
 
-    group_instances = get_instances_in_group(group_tag, group)
-    group_instances_names = get_group_instances_names(
-        name_tag, group_instances)
+    instances = get_instances()
+    instance_names = get_instance_names(
+        name_tag, instances)
 
-    logger.info('existing names in group "{}"'.format(group_instances_names))
+    logger.info('existing names "{}"'.format(instance_names))
 
     n = 0
     while retries > 0:
         n += 1
-        name = '{}{}'.format(name_prefix or group, n)
-        if name in group_instances_names:
+        name = '{}{}'.format(name_prefix, n)
+        if name in instance_names:
             continue
 
         logger.info('trying name "{}"'.format(name))
@@ -118,25 +119,24 @@ def set_instance_name(
         logger.debug('sleep for "{}"'.format(t))
         time.sleep(t)
 
-        group_instances = get_instances_in_group(group_tag, group)
-        group_instances_names = get_group_instances_names(
-            name_tag, group_instances)
+        instances = get_instances()
+        instance_names = get_instance_names(
+            name_tag, instances)
 
-        if group_instances_names.count(name) > 1:
+        if instance_names.count(name) > 1:
             logger.warning('name collision "{}"'.format(name))
-        elif group_instances_names.count(name) == 1:
+        elif instance_names.count(name) == 1:
             logger.info('name successfully set "{}"'.format(name))
             break
         else:
             logger.error(
-                'name not found in group after set "{}"'.format(name))
+                'name not found after set "{}"'.format(name))
 
         retries -= 1
         continue
     else:
         logger.error('max retries reached')
         exit(1)
-
 
 
 def main():
